@@ -303,24 +303,22 @@ body.dark{
   cursor:pointer;
 }
 
-/* Study */
+/* Study header */
 .study-head{display:flex;align-items:flex-end;justify-content:space-between;width:100%;gap:12px}
 
-/* flip card */
+/* Flip card */
 .study-card{
-  border-radius: 26px;
-  border:1px solid var(--line);
-  background: transparent;
-  padding: 0;
+  position:relative;
+  margin-top:12px;
   cursor:pointer;
   user-select:none;
-  margin-top: 12px;
   perspective:1200px;
 }
 .study-card-inner{
   position:relative;
   border-radius:26px;
   background:var(--panel);
+  border:1px solid var(--line);
   padding:26px;
   transform-style:preserve-3d;
   transition:transform .35s ease;
@@ -329,14 +327,16 @@ body.dark{
   transform:rotateY(180deg);
 }
 .study-face{
-  position:relative;
-  backface-visibility:hidden;
-}
-.study-face.back{
-  transform:rotateY(180deg);
   position:absolute;
   inset:0;
   padding:26px;
+  backface-visibility:hidden;
+}
+.study-face.front{
+  transform:rotateY(0deg);
+}
+.study-face.back{
+  transform:rotateY(180deg);
 }
 
 .study-badge{
@@ -361,6 +361,7 @@ body.dark{
   color:var(--ink);
 }
 
+/* Photo */
 .photo-upload{
   display:flex;
   flex-direction:column;
