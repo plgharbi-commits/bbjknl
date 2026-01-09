@@ -1,250 +1,313 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>lashcard Study App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body class="theme-purple">
-    <header class="app-header">
-      <h1>lashcard Study App</h1>
-      <p class="tagline">
-        Practice with multiple decks and save your progress.
-      </p>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Card-Forge</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Overlay + Drawer -->
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-inner">
+      <div class="drawer-title">MAIN MENU</div>
+      <button class="drawer-item" data-route="library">
+        <span class="drawer-ico" aria-hidden="true">🏠</span>
+        <span>Home Library</span>
+      </button>
+      <button class="drawer-item" data-route="create">
+        <span class="drawer-ico" aria-hidden="true">➕</span>
+        <span>Create New Deck</span>
+      </button>
 
-      <!-- Theme switcher circles -->
-      <div class="theme-switcher">
-        <button
-          class="theme-dot theme-purple"
-          data-theme="purple"
-          aria-label="Purple theme"
-        ></button>
-        <button
-          class="theme-dot theme-green"
-          data-theme="green"
-          aria-label="Green theme"
-        ></button>
-        <button
-          class="theme-dot theme-blue"
-          data-theme="blue"
-          aria-label="Blue theme"
-        ></button>
-        <button
-          class="theme-dot theme-red"
-          data-theme="red"
-          aria-label="Red theme"
-        ></button>
-        <button
-          class="theme-dot theme-grey"
-          data-theme="grey"
-          aria-label="Grey theme"
-        ></button>
+      <div class="drawer-sep"></div>
+      <div class="drawer-title">PREFERENCES</div>
+      <div class="drawer-row">
+        <div class="drawer-item-static">
+          <span class="drawer-ico" aria-hidden="true">🌙</span>
+          <span>Dark Mode</span>
+        </div>
+        <label class="switch" aria-label="Toggle dark mode">
+          <input id="darkToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
       </div>
-    </header>
 
-    <main class="app-main">
-      <!-- Top bar: deck selector + shuffle + reset + timed mode -->
-      <section class="top-bar">
-        <div class="deck-selector-group">
-          <label for="deck-select">Deck:</label>
-          <select id="deck-select">
-            <!-- Options are filled from JavaScript -->
+      <div class="drawer-sep"></div>
+      <div class="drawer-title">THEME COLOR</div>
+      <div id="palette" class="palette">
+        <button class="swatch is-active" data-color="#45DFB1" style="--sw:#45DFB1" aria-label="Green"></button>
+        <button class="swatch" data-color="#831DC6" style="--sw:#831DC6" aria-label="Purple"></button>
+        <button class="swatch" data-color="#008EAD" style="--sw:#008EAD" aria-label="Blue"></button>
+        <button class="swatch" data-color="#A81010" style="--sw:#A81010" aria-label="Red"></button>
+        <button class="swatch" data-color="#737373" style="--sw:#737373" aria-label="Gray"></button>
+        <button class="swatch" data-color="#E11D48" style="--sw:#E11D48" aria-label="Pink"></button>
+        <button class="swatch" data-color="#F97316" style="--sw:#F97316" aria-label="Orange"></button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button id="drawerBtn" class="icon-btn" aria-label="Open menu">☰</button>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">📘</div>
+        <div class="brand-text">
+          <div class="brand-name">Memora</div>
+          <div class="brand-sub">SMART LEARNING</div>
+        </div>
+      </div>
+      <div class="tabs">
+        <button id="tabHome" class="tab is-active" data-route="library">Home</button>
+        <button id="tabInfo" class="tab" data-route="info">Info</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Views -->
+  <main class="main">
+    <!-- LIBRARY -->
+    <section id="view-library" class="view is-active">
+      <div class="container">
+        <div class="hero">
+          <h1>Master your <span class="accent">Knowledge</span></h1>
+          <p>Select a deck to start studying. Create decks and track hard cards.</p>
+        </div>
+        <div id="deckGrid" class="grid"></div>
+      </div>
+    </section>
+
+    <!-- CREATE -->
+    <section id="view-create" class="view">
+      <div class="container narrow">
+        <div class="page-head">
+          <button class="back" id="backCreate" aria-label="Back">←</button>
+          <h2>Create New Deck</h2>
+        </div>
+
+        <div class="panel">
+          <label class="label">Deck Name</label>
+          <input id="deckName" class="input" placeholder="e.g. Biology 101, French Verbs..." />
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Cards</div>
+            <button class="link" id="addCard">+ Add Card</button>
+          </div>
+
+          <!-- optional: toggle for card type when creating -->
+          <div class="card-type-toggle" style="margin-bottom:12px">
+            <button id="typeBasic" class="card-type-btn is-active" type="button">Basic</button>
+            <button id="typeMultiple" class="card-type-btn" type="button">Multiple choice</button>
+          </div>
+
+          <div id="cardsList" class="cards-list"></div>
+        </div>
+
+        <button class="cta" id="createDeckBtn">Create Deck</button>
+      </div>
+    </section>
+
+    <!-- STUDY -->
+    <section id="view-study" class="view">
+      <div class="container narrow">
+        <div class="page-head">
+          <button class="back" id="backStudy" aria-label="Back">←</button>
+          <div class="study-head">
+            <div>
+              <h2 id="studyTitle">Study</h2>
+              <div id="studyMeta" class="muted">0 / 0</div>
+            </div>
+            <div style="text-align:right">
+              <div id="studyCounts" class="small muted">Answered: 0 · Hard: 0</div>
+              <div id="studyTimer" class="small" style="margin-top:4px;display:none">
+                ⏱ <span id="studyTimerValue">0</span>s
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="studyCard" class="study-card" role="button" tabindex="0">
+          <div class="study-card-inner">
+            <div class="study-face front">
+              <div id="studyBadgeFront" class="study-badge">QUESTION</div>
+              <div id="studyTextFront" class="study-text">...</div>
+            </div>
+            <div class="study-face back">
+              <div id="studyBadgeBack" class="study-badge">ANSWER</div>
+              <div id="studyTextBack" class="study-text">...</div>
+            </div>
+          </div>
+          <div class="study-hint">Click to flip</div>
+        </div>
+
+        <div class="row">
+          <button class="btn" id="prevBtn">Previous</button>
+          <button class="btn" id="shuffleBtn">Shuffle cards</button>
+          <button class="btn" id="resetProgressBtn">Reset progress</button>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="markHardBtn">Mark Hard</button>
+          <button class="btn primary" id="nextBtn">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MANAGE -->
+    <section id="view-manage" class="view">
+      <div class="container narrow">
+        <div class="page-head">
+          <button class="back" id="backManage" aria-label="Back">←</button>
+          <div class="manage-head">
+            <h2 id="manageTitle">Manage Deck</h2>
+            <button class="danger" id="deleteDeckBtn">Delete Deck</button>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:10px">
+          <label class="label">Deck Name</label>
+          <input id="manageDeckName" class="input" />
+        </div>
+
+        <div class="panel">
+          <div id="manageMeta" class="small muted">0 cards</div>
+          <div id="manageList" class="manage-list"></div>
+        </div>
+
+        <button class="cta" id="addCardToExistingBtn" type="button">Add Card</button>
+      </div>
+    </section>
+
+    <!-- INFO -->
+    <section id="view-info" class="view">
+      <div class="container">
+        <div class="info-hero">
+          <div class="pill">✦ The Modern Way to Study</div>
+          <h1>Elevate Your <span class="grad">Learning Experience</span></h1>
+          <p>Create decks, study faster, and mark hard cards. Customize theme and dark mode.</p>
+          <button class="hero-cta" id="goCreateFromInfo">Create Your First Deck</button>
+        </div>
+        <div id="infoGrid" class="info-grid"></div>
+        <div class="quote">
+          “FlashMind is the dream app for every student : who has not wished to have a website that replaces handmade flashcards that take up space and often get lost ? FlashMind answers your wishes : no more wasting time in searching for paper cards because everything you need is here !”
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Card Editor Modal (existing manage-add modal) -->
+  <div id="cardEditorModal" class="modal" style="display:none">
+    <div id="modalOverlay" class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-head">
+        <h3>Add Card</h3>
+        <button id="closeCardEditorBtn" class="modal-close" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="card-type-toggle" style="margin-bottom:12px">
+          <button id="editorTypeBasic" class="card-type-btn is-active" type="button">Basic</button>
+          <button id="editorTypeMultiple" class="card-type-btn" type="button">Multiple choice</button>
+        </div>
+
+        <div id="basicCardEditor">
+          <div class="small" style="margin-bottom:6px">QUESTION</div>
+          <textarea id="editorQuestionBasic" class="textarea"></textarea>
+          <div class="small" style="margin:12px 0 6px">ANSWER</div>
+          <textarea id="editorAnswerBasic" class="textarea"></textarea>
+        </div>
+
+        <div id="multipleChoiceEditor" style="display:none">
+          <div class="small" style="margin-bottom:6px">QUESTION</div>
+          <textarea id="editorQuestionMultiple" class="textarea"></textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+            <input id="editorChoice1" class="input choice-input" placeholder="Choice 1" />
+            <input id="editorChoice2" class="input choice-input" placeholder="Choice 2" />
+            <input id="editorChoice3" class="input choice-input" placeholder="Choice 3" />
+            <input id="editorChoice4" class="input choice-input" placeholder="Choice 4" />
+          </div>
+          <div class="small" style="margin:12px 0 6px">CORRECT ANSWER</div>
+          <select id="editorCorrectAnswer" class="input">
+            <option value="0">Choice 1</option>
+            <option value="1">Choice 2</option>
+            <option value="2">Choice 3</option>
+            <option value="3">Choice 4</option>
           </select>
         </div>
 
-        <div class="top-bar-actions">
-          <button id="shuffle-btn" class="btn secondary">Shuffle</button>
-          <button id="reset-progress-btn" class="btn ghost">
-            Reset Progress
-          </button>
-          <button id="timed-mode-btn" class="btn primary">
-            timed test mode
-          </button>
-        </div>
-      </section>
-
-      <!-- Flashcard area -->
-      <section class="card-wrapper">
-        <div id="card" class="flashcard">
-          <div class="card-inner">
-            <div class="card-face card-front">
-              <p id="card-question" class="card-text">
-                Question will appear here
-              </p>
-            </div>
-            <div class="card-face card-back">
-              <p id="card-answer" class="card-text">Answer will appear here</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Timer + status -->
-      <section class="timer-bar">
-        <span id="timer-label" class="timer-label">Timer: off</span>
-        <span id="timer-countdown" class="timer-countdown"></span>
-        <span id="timer-status" class="timer-status"></span>
-      </section>
-
-      <!-- Controls: flip, hard, prev/next, progress -->
-      <section class="controls">
-        <div class="controls-main">
-          <button id="flip-btn" class="btn primary">Flip</button>
-          <button id="mark-hard-btn" class="btn warning">Mark Hard</button>
-        </div>
-
-        <div class="controls-nav">
-          <button id="prev-btn" class="btn secondary">&larr; Previous</button>
-          <span id="progress-text" class="progress-text">Card 1 of 1</span>
-          <button id="next-btn" class="btn secondary">Next &rarr;</button>
-        </div>
-
-        <div class="controls-extra">
-          <span id="hard-count" class="meta-text">Hard cards: 0</span>
-          <span id="studied-count" class="meta-text">Studied cards: 0</span>
-        </div>
-      </section>
-
-      <!-- Add new flashcard form -->
-      <section class="add-card-section">
-        <h2>Add New Flashcard</h2>
-        <form id="add-card-form">
-          <div class="form-row">
-            <label for="new-deck-select">Deck</label>
-            <select id="new-deck-select">
-              <!-- Same decks as main select -->
-            </select>
-          </div>
-          <div class="form-row">
-            <label for="new-question">Question</label>
-            <textarea id="new-question" rows="2" required></textarea>
-          </div>
-          <div class="form-row">
-            <label for="new-answer">Answer</label>
-            <textarea id="new-answer" rows="2" required></textarea>
-          </div>
-          <button type="submit" class="btn primary full-width">Add Card</button>
-        </form>
-      </section>
-    </main>
-
-    <footer class="app-footer">
-      <small>Frontend-only flashcard app using HTML, CSS & Vanilla JS.</small>
-    </footer>
-
-    <!-- Timed mode settings modal -->
-    <div id="timed-modal" class="modal" aria-hidden="true">
-      <div class="modal-backdrop"></div>
-      <div class="modal-content">
-        <h2>Timed test mode</h2>
-        <p class="modal-subtitle">Choose time per card and mode.</p>
-
-        <div class="modal-section">
-          <span class="modal-label">Preset speed:</span>
-          <div class="preset-buttons">
-            <button
-              type="button"
-              class="btn secondary preset-btn"
-              data-seconds="8"
-            >
-              Fast (8s)
-            </button>
-            <button
-              type="button"
-              class="btn secondary preset-btn"
-              data-seconds="15"
-            >
-              Normal (15s)
-            </button>
-            <button
-              type="button"
-              class="btn secondary preset-btn"
-              data-seconds="25"
-            >
-              Slow (25s)
-            </button>
-          </div>
-        </div>
-
-        <div class="modal-section">
-          <label class="modal-label" for="custom-seconds"
-            >Or custom seconds per card</label
-          >
-          <input id="custom-seconds" type="number" min="3" max="600" step="1" />
-        </div>
-
-        <div class="modal-section">
-          <span class="modal-label">Mode:</span>
-          <div class="mode-options">
-            <label>
-              <input
-                type="radio"
-                name="timed-mode-kind"
-                value="practice"
-                checked
-              />
-              Practice mode (only warning on timeout)
+        <div style="margin-top:12px">
+          <div class="small" style="margin:0 0 8px 0">PHOTO (OPTIONAL)</div>
+          <div class="photo-upload">
+            <input id="editorPhotoInput" type="file" accept="image/*" style="display:none" />
+            <label for="editorPhotoInput" class="photo-label">
+              <span class="photo-placeholder">📷 Add Photo</span>
             </label>
-            <label>
-              <input type="radio" name="timed-mode-kind" value="challenge" />
-              Challenge mode (auto Hard + auto next)
-            </label>
+            <div id="editorPhotoPreview" class="photo-preview" style="display:none"></div>
           </div>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" id="timed-cancel-btn" class="btn ghost">
-            Cancel
-          </button>
-          <button type="button" id="timed-start-btn" class="btn primary">
-            Start timed session
-          </button>
         </div>
       </div>
-    </div>
-
-    <!-- Timed session summary modal -->
-    <div id="summary-modal" class="modal" aria-hidden="true">
-      <div class="modal-backdrop"></div>
-      <div class="modal-content">
-        <h2>Timed session summary</h2>
-        <div class="summary-stats">
-          <p>
-            <strong>Total reviewed:</strong> <span id="summary-total"></span>
-          </p>
-          <p>
-            <strong>Answered in time:</strong>
-            <span id="summary-on-time"></span>
-          </p>
-          <p>
-            <strong>Timed out (auto-hard):</strong>
-            <span id="summary-timeouts"></span>
-          </p>
-        </div>
-
-        <div class="summary-timeouts-list">
-          <h3>Timed-out cards</h3>
-          <ul id="summary-timeout-list"></ul>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" id="summary-close-btn" class="btn ghost">
-            Close
-          </button>
-          <button
-            type="button"
-            id="summary-review-timeouts-btn"
-            class="btn primary"
-          >
-            Review only these
-          </button>
-        </div>
+      <div class="modal-footer">
+        <button id="cancelCardEditorBtn" class="btn" type="button">Cancel</button>
+        <button id="saveCardEditorBtn" class="btn primary" type="button">Save Card</button>
       </div>
     </div>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
+  <!-- Timed test config modal -->
+  <div id="timedConfigModal" class="modal" style="display:none">
+    <div id="timedModalOverlay" class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-head">
+        <h3>Timed test mode</h3>
+        <button id="closeTimedConfigBtn" class="modal-close" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="small">TIME PER CARD</div>
+        <div style="display:flex;gap:8px;margin:10px 0 14px">
+          <button class="btn" data-tpreset="8" type="button">Fast (8s)</button>
+          <button class="btn" data-tpreset="15" type="button">Normal (15s)</button>
+          <button class="btn" data-tpreset="25" type="button">Slow (25s)</button>
+        </div>
+        <input id="timedCustomSeconds" class="input" type="number" min="3" max="120" placeholder="Custom seconds" />
+        <div style="margin-top:16px">
+          <div class="small">MODE</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="timedPracticeBtn" class="btn" type="button">Practice</button>
+            <button id="timedChallengeBtn" class="btn primary" type="button">Challenge</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelTimedConfigBtn" class="btn" type="button">Cancel</button>
+        <button id="startTimedSessionBtn" class="btn primary" type="button">Start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session summary modal -->
+  <div id="sessionSummaryModal" class="modal" style="display:none">
+    <div id="sessionSummaryOverlay" class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-head">
+        <h3>Session summary</h3>
+        <button id="closeSessionSummaryBtn" class="modal-close" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="summaryStats" class="small"></div>
+        <div id="summaryTimeoutList" style="margin-top:16px"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="summaryReviewTimeoutsBtn" class="btn" type="button" style="display:none">
+          Review only these
+        </button>
+        <button id="summaryCloseBtn" class="btn primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
 </html>
-
-
